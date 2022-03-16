@@ -18,7 +18,7 @@
   - [BeforeEach Hook](#before-each)
   - [AfterEach Hook](#after-each)
 
-* [Custom Function]()
+* [Custom Function](#custom-function)
 
 
 ### Skip Annotation
