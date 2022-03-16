@@ -14,6 +14,13 @@
   - [Fullpage Screenshot](#taking-fullpage-screenshot)
   - [Element Screenshot](#element-screenshot)
 
+* Hooks
+  - [BeforeEach Hook](#before-each)
+  - [AfterEach Hook](#after-each)
+
+* [Custom Function]()
+
+
 ### Skip Annotation
 
 > A test can be skipped by adding `.skip` into that particular test
@@ -289,3 +296,116 @@ test.only('Google page @searchEngine', async ({ page }) => {
 });
 ```
 
+### Before each
+
+```ts
+import { test, expect } from '@playwright/test';
+
+test.beforeEach(async ({ page }) => {
+  await page.goto('https://google.com/')
+})
+
+test('Google image screenshot', async ({ page }) => {
+  await expect(page).toHaveTitle("Google");
+
+  //store the element
+  const googleImage = await page.locator("(//img)[1]")
+  await googleImage.screenshot({ path: "googleImage.png" }) //capture the screenshot of the element
+});
+
+test('Google searchbar screenshot', async ({ page }) => {
+  await expect(page).toHaveTitle("Google");
+
+  //store the element
+  const googleImage = await page.locator("//div[@class='RNNXgb']")
+  await googleImage.screenshot({ path: "googleSearchImage.png" }) //capture the screenshot of the element
+});
+```
+
+Output:
+
+```sh
+Running 2 tests using 1 worker
+
+  ✓  ftests/tagging.spec.ts:7:1 › Google image screenshot (2s)
+  ✓  ftests/tagging.spec.ts:15:1 › Google searchbar screenshot (2s)
+
+
+  2 passed (4s)
+```
+
+### After Each
+
+```ts
+import { test, expect } from '@playwright/test';
+
+test.beforeEach(async ({ page }) => {
+  await page.goto('https://google.com/')
+})
+
+test.afterEach(async ({ page }) => {
+  await page.screenshot({ path: "screenshot.png" , fullPage: true })
+})
+
+test('Google image screenshot', async ({ page }) => {
+  await expect(page).toHaveTitle("Google");
+
+  //store the element
+  const searchBar = await page.locator("//div[@class='RNNXgb']")
+  searchBar.type("test 1")
+});
+
+test('Google searchbar screenshot', async ({ page }) => {
+  await expect(page).toHaveTitle("Google");
+
+  //store the element
+  const searchBar = await page.locator("//div[@class='RNNXgb']")
+  searchBar.type("test 2")
+});
+```
+### Custom Function
+
+> helper.ts
+
+```ts
+export async function locadGooglePage(page) {
+    await page.goto('https://google.com/')
+}
+
+export async function takeFullpageScreenshot(page) {
+    await page.screenshot({ path: "screenshot.png" , fullPage: true })
+}
+```
+
+> test.spec.ts
+
+```ts
+import { test, expect } from '@playwright/test';
+
+// import the functions
+import {locadGooglePage, takeFullpageScreenshot} from '../ftests/helper'
+
+test('Google image screenshot', async ({ page }) => {
+
+  // calling function
+  await locadGooglePage(page) // pass `page` as parameter
+
+  await expect(page).toHaveTitle("Google");
+  const searchBar = await page.locator("//div[@class='RNNXgb']")
+  searchBar.type("test 1")
+
+  //calling function
+  await takeFullpageScreenshot(page) //pass `page` as parameter
+});
+```
+
+Output:
+
+```
+Running 1 test using 1 worker
+
+  ✓  ftests/tagging.spec.ts:6:1 › Google image screenshot (2s)
+
+
+  1 passed (2s)
+```
