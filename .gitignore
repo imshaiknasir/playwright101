@@ -1,5 +1,4 @@
-!README.md
-node_modules
-package*
-playwright*
-tests*
+node_modules/
+/test-results/
+/playwright-report/
+/playwright/.cache/
